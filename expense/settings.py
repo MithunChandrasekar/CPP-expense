@@ -28,7 +28,7 @@ SECRET_KEY = '=t^os0)k(j25-%_p-i422xp@sluf^pl-zso&u*hw0w0$&30wtd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['expense-application-env.eba-7v85kh5i.us-east-1.elasticbeanstalk.com']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://15155f23e5ef4afa812dfc93aaef473f.vfs.cloud9.us-east-1.amazonaws.com',
