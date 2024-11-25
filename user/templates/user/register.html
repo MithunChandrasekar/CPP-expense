@@ -1,0 +1,28 @@
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<html>
+    <head>
+        <title>TrackYourEuro Registration</title>
+        <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    </head>
+    <body>
+        <br>
+        <div class="container bg-white shadow-md p-5 form-layout">
+            <h3>TrackYourEuro Registration</h3>
+            <br>
+            <br>
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <br><br>
+                <button class="btn btn-secondary btn-md w-100 btn-block p-3" type="submit">Register</button>
+            </form>
+        </div>
+        <br>
+    </body>
+</html>
+{% endblock content %}

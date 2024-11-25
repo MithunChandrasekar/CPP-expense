@@ -1,0 +1,63 @@
+{% load static %}
+
+
+<html>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width-device-width, initial-scale=1, maximum-scale=1"/>
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" type="text/css" href="https://bootswatch.com/5/morph/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href=" {% static 'css/styles.css' %} ">
+    
+
+    </head>
+    <body>
+      <nav class='shadow-lg p-2 px-10'>
+        <div class=" container flex flex-wrap  items-center mc-auto">
+            <a href="#" class="flex">
+                <img class="h-10 m-3" src="{% static 'myapp/images/wallet.png' %}" alt="">
+                <span class="self-center text-xl font-semibold">TrackYourEuro</span>
+            </a>
+            &nbsp;     &nbsp;     &nbsp; &nbsp;     &nbsp;     &nbsp; &nbsp;     &nbsp;     &nbsp; 
+            <li class="nav-link">
+    
+              <a class="nav-link" type=""  href="{% url 'dashboard' %}">Dashboard</a>
+    
+            </li>
+            &nbsp;     &nbsp;     &nbsp; &nbsp;     &nbsp;     &nbsp; &nbsp;     &nbsp;     &nbsp; 
+            <li class="nav-link">
+    
+              <a class="nav-link" type=""  href="{% url 'profile-management' %}">Profile Management</a>
+    
+            </li>
+
+        </div>
+      </nav>
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"  crossorigin="anonymous"></script>
+
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+
+integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+
+crossorigin="anonymous">
+
+</script>
+
+    {% block content %}
+
+
+    {% endblock content %}
+
+
+
+
+    </body>
+</html>
