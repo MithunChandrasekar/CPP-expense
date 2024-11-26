@@ -23,15 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = '=t^os0)k(j25-%_p-i422xp@sluf^pl-zso&u*hw0w0$&30wtd'
+SECRET_KEY = '=t^os0)k(j25-%_p-i422xp@sluf^pl-zso&u*hw0w0$&30wtd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+DEBUG = True
 
-
-
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
-
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://15155f23e5ef4afa812dfc93aaef473f.vfs.cloud9.us-east-1.amazonaws.com',
@@ -138,13 +135,13 @@ USE_TZ = True
 
 # Add S3 configuration
 
-#AWS_STORAGE_BUCKET_NAME = 'my-expense-app-bucket'
-#AWS_S3_REGION_NAME = 'us-east-1'  # Replace with your region (if different)
-#AWS_REGION = 'us-east-1'  # Ensure it matches AWS_S3_REGION_NAME
-#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_STORAGE_BUCKET_NAME = 'my-expense-app-bucket'
+AWS_S3_REGION_NAME = 'us-east-1'  # Replace with your region (if different)
+AWS_REGION = 'us-east-1'  # Ensure it matches AWS_S3_REGION_NAME
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Media URL for accessing files
-#MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
 
 # Media URL for accessing file
 
@@ -157,38 +154,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-#STATIC_URL = 'static/'
+STATIC_URL = 'static/'
 
-#STATICFILES_DIRS = [BASE_DIR / 'static']
-
-
-
-# AWS S3 configurations
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "django-static-files-expense")
-AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
-
-
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-
-# Static and media files
-STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-
-
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-
-# Secret key
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-
-# Debug mode
-DEBUG = os.getenv("DEBUG", "False") == "True"
-
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -196,6 +164,8 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 #this was not there on default but was added when i brought to cloud9
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+AWS_REGION_NAME = 'us-east-1'  # Replace with your region
 AWS_SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:973195829891:user-notifications'  # Replace with your Topic ARN
 
 
