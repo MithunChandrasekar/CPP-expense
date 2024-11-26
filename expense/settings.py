@@ -138,10 +138,10 @@ USE_TZ = True
 
 # Add S3 configuration
 
-AWS_STORAGE_BUCKET_NAME = 'my-expense-app-bucket'
-AWS_S3_REGION_NAME = 'us-east-1'  # Replace with your region (if different)
-AWS_REGION = 'us-east-1'  # Ensure it matches AWS_S3_REGION_NAME
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#AWS_STORAGE_BUCKET_NAME = 'my-expense-app-bucket'
+#AWS_S3_REGION_NAME = 'us-east-1'  # Replace with your region (if different)
+#AWS_REGION = 'us-east-1'  # Ensure it matches AWS_S3_REGION_NAME
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Media URL for accessing files
 #MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
@@ -162,22 +162,25 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 #STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
-# Static files settings
+
+# AWS S3 configurations
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "django-static-files-expense")
 AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
 
-# Configure S3
+
 AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
-# Static files storage configuration
+# Static and media files
 STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
-# Media files storage configuration (optional)
+
+
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
 
 # Secret key
 SECRET_KEY = os.getenv("SECRET_KEY", "")
