@@ -28,7 +28,10 @@ SECRET_KEY = '=t^os0)k(j25-%_p-i422xp@sluf^pl-zso&u*hw0w0$&30wtd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['expense-application-env.eba-7v85kh5i.us-east-1.elasticbeanstalk.com']
+
+
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+
 
 CSRF_TRUSTED_ORIGINS = [
     'https://15155f23e5ef4afa812dfc93aaef473f.vfs.cloud9.us-east-1.amazonaws.com',
@@ -154,9 +157,13 @@ MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaw
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+#STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [BASE_DIR / 'static']
+#STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
