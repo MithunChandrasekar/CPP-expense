@@ -7,7 +7,7 @@
 
     
    
-    <h2>Total Expenses: {{ total_expenses }}</h2>
+    
 
     
 
@@ -22,7 +22,7 @@
              <br>
             <h1>Welcome, {{ username }}</h1>
             <br>
-            <img src="{{ profilePic }}" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;">
+            <img src="{% static 'myapp/images/Default.png' %}" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;">
             
 
 
@@ -85,8 +85,7 @@
 
             <span class=" font-bold text-green-500">
                 
-                Total : € {{total_expenses.amount__sum}}
-            </span>
+                Total : € {{ total_expenses }}       </span>
         </div>
         
 
