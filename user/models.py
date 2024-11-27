@@ -102,12 +102,15 @@ class ExpenseManager:
 
     @staticmethod
     def update_expense(expense_id, user_id, **kwargs):
-        update_expression = "SET " + ", ".join(f"{k} = :{k}" for k in kwargs)
+        # Use expression attribute names to handle reserved keywords like "name"
+        update_expression = "SET " + ", ".join(f"#{k} = :{k}" for k in kwargs)
+        expression_attribute_names = {f"#{k}": k for k in kwargs}
         expression_values = {f":{k}": v for k, v in kwargs.items()}
-
+    
         expense_table.update_item(
             Key={'expense_id': expense_id, 'user_id': user_id},
             UpdateExpression=update_expression,
+            ExpressionAttributeNames=expression_attribute_names,
             ExpressionAttributeValues=expression_values,
         )
 
