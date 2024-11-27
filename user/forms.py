@@ -26,6 +26,7 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=TextInput(attrs={'placeholder': 'Username'}))
     password = forms.CharField(widget=PasswordInput(attrs={'placeholder': 'Password'}))
 
+'''
 
 class ExpenceForm(forms.Form):
     """
@@ -42,7 +43,7 @@ class ExpenceForm(forms.Form):
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': 'Category'}),
     )
-
+'''
     
 class ExpenseForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
