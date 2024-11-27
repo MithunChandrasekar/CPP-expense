@@ -60,7 +60,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('my-login/', views.my_login, name='my-login'),
     path('delete-account/', views.delete_account, name='delete-account'),
-    path('edit/<str:expense_id>/', views.edit_expense, name='edit'),
+    path('edit-expense/<str:expense_id>/', views.edit_expense, name='edit-expense'),
     path('delete/<str:expense_id>/', views.delete_expense, name='delete'),
     path('user-logout/', views.user_logout, name='user-logout'),
     path('profile-management/', views.profile_management, name='profile-management'),
@@ -72,3 +72,4 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
+

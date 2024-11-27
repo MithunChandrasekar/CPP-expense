@@ -44,6 +44,21 @@ class ExpenceForm(forms.Form):
     )
 
     
+class ExpenseForm(forms.Form):
+    name = forms.CharField(max_length=100, required=True)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+    category = forms.ChoiceField(
+        choices=[
+            ('entertainment', 'Entertainment'),
+            ('grocery', 'Transport'),
+            ('leisure', 'Leisure'),
+            ('rent+bills', 'Rent+Bills'),
+            ('transportation', 'Transportation'),
+            ('other', 'Other'),
+        ],
+        required=True
+    )
+    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))    
 
 
 

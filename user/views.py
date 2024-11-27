@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import ProfileManager, ExpenseManager
-from .forms import CreateUserForm, LoginForm, ExpenceForm, UpdateProfileForm, UpdateUserForm
+from .forms import CreateUserForm, LoginForm, ExpenseForm, UpdateProfileForm, UpdateUserForm
 import uuid  # For generating unique expense IDs
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 '''
 
 def homepage(request):
-    # Log a test message
-    #logger.info("Homepage accessed")
+    
     return render(request, 'user/index.html')
 
 
@@ -46,7 +45,6 @@ def register(request):
                     'user_id': str(user.id),  # DynamoDB uses user_id as the partition key
                     'username': user.username,
                     'email': user.email,
-                    'profile_pic_url': f"{settings.MEDIA_URL}profile_pictures/default.png"  # Default profile picture
                 }
             )
 
@@ -81,34 +79,17 @@ def my_login(request):
 @login_required(login_url='my-login')
 def user_logout(request):
     logout(request)
-    return redirect("")
-
-
-
-
-def get_profile_picture(user_id):
-    """
-    Fetch the profile picture URL from DynamoDB or return the default picture URL.
-    """
-    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_S3_REGION_NAME)
-    profile_table = dynamodb.Table('Profile')
-
-    response = profile_table.get_item(Key={'user_id': user_id})
-    if 'Item' in response and 'profile_pic_url' in response['Item']:
-        return response['Item']['profile_pic_url']
-    
-    # Return default picture URL
-    return f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/profile_pictures/default.png"
+    return redirect('homepage')
 
 
 
 @login_required(login_url='my-login')
 def dashboard(request):
     user_id = str(request.user.id)
-    profile_pic_url = get_profile_picture(user_id)
+    
     
     if request.method == 'POST':
-        form = ExpenceForm(request.POST)
+        form = ExpenseForm(request.POST)
         if form.is_valid():
             expense_data = form.cleaned_data
             expense_id = str(uuid.uuid4())  # Generate unique ID
@@ -122,7 +103,7 @@ def dashboard(request):
             )
             return redirect('dashboard')  # Refresh the page to display updated data
     else:
-        form = ExpenceForm()
+        form = ExpenseForm()
 
     # Fetch existing expenses
     expenses = ExpenseManager.get_expenses_by_user(user_id)
@@ -165,7 +146,7 @@ def dashboard(request):
     
 
     context = {
-        'profilePic': profile_pic_url,
+        
         'username': request.user.username,
         'expenses': expenses,
         'total_expenses': total_expenses,
@@ -185,7 +166,7 @@ def dashboard(request):
 @login_required(login_url='my-login')
 def add_expense(request):
     if request.method == 'POST':
-        form = ExpenceForm(request.POST)
+        form = ExpenseForm(request.POST)
         if form.is_valid():
             expense_data = form.cleaned_data
             expense_id = str(uuid.uuid4())  # Generate unique ID
@@ -199,16 +180,29 @@ def add_expense(request):
             )
             return redirect('dashboard')
 
-    form = ExpenceForm()
+    form = ExpenseForm()
     return render(request, 'user/add-expense.html', {'form': form})
 
-'''
+
+
+
+
+
 
 @login_required(login_url='my-login')
 def edit_expense(request, expense_id):
+    # Get the current user ID
     user_id = str(request.user.id)
+
+    # Fetch the expense details from DynamoDB
+    expenses = ExpenseManager.get_expenses_by_user(user_id)
+    expense = next((item for item in expenses if item['expense_id'] == expense_id), None)
+
+    if not expense:
+        return redirect('dashboard')  # Redirect if the expense doesn't exist
+
     if request.method == 'POST':
-        form = ExpenceForm(request.POST)
+        form = ExpenseForm(request.POST)
         if form.is_valid():
             expense_data = form.cleaned_data
             ExpenseManager.update_expense(
@@ -216,86 +210,22 @@ def edit_expense(request, expense_id):
                 user_id=user_id,
                 name=expense_data['name'],
                 amount=expense_data['amount'],
-                category=expense_data['category']
+                category=expense_data['category'],
+                date=expense_data['date'].isoformat(),  # Convert date to string
             )
+            
             return redirect('dashboard')
-
-    # Pre-fill the form with existing data (fetch from DynamoDB)
-    expenses = ExpenseManager.get_expenses_by_user(user_id)
-    expense = next((exp for exp in expenses if exp['expense_id'] == expense_id), None)
-    form = ExpenceForm(initial=expense)
-    return render(request, 'user/edit-expense.html', {'form': form})
-'''
-@login_required(login_url='my-login')
-def edit_expense(request, expense_id):
-    user_id = str(request.user.id)  # Get the logged-in user's ID
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Replace with your AWS region
-    expense_table = dynamodb.Table('Expense')
-
-    # Fetch the existing expense data from DynamoDB
-    try:
-        response = expense_table.get_item(
-            Key={
-                'expense_id': expense_id,
-                'user_id': user_id
-            }
-        )
-        expense_data = response.get('Item', {})
-    except Exception as e:
-        expense_data = {}
-        print(f"Error fetching expense data: {e}")  # Logging for debugging
-
-    # If the expense doesn't exist, redirect back to the dashboard
-    if not expense_data:
-        messages.error(request, "Expense not found.")
-        return redirect('dashboard')
-
-    # If the request is POST, update the expense
-    if request.method == 'POST':
-        form = ExpenceForm(request.POST)
-
-        if form.is_valid():
-            try:
-                # Update the expense data
-                updated_data = form.cleaned_data
-
-                # Save the updated data to DynamoDB
-                expense_table.update_item(
-                    Key={
-                        'expense_id': expense_id,
-                        'user_id': user_id
-                    },
-                    UpdateExpression="""
-                        SET name = :name,
-                            amount = :amount,
-                            category = :category
-                    """,
-                    ExpressionAttributeValues={
-                        ':name': updated_data['name'],
-                        ':amount': updated_data['amount'],
-                        ':category': updated_data['category']
-                    }
-                )
-
-                messages.success(request, "Expense updated successfully.")
-                return redirect('dashboard')
-            
-            
-            except Exception as e:
-                print(f"Error updating expense: {e}")
-                messages.error(request, "Failed to update the expense. Please try again.")
+    
     else:
-        # Populate the form with existing data for GET requests
-        form = ExpenceForm(initial={
-            'name': expense_data.get('name', ''),
-            'amount': expense_data.get('amount', ''),
-            'category': expense_data.get('category', ''),
+        # Populate the form with the current expense data
+        form = ExpenseForm(initial={
+            'name': expense['name'],
+            'amount': expense['amount'],
+            'category': expense['category'],
+            'date': expense['date'],
         })
 
-    return render(request, 'user/edit-expense.html', {
-        'form': form,
-        'expense_id': expense_id  # Pass the expense_id for debugging or dynamic display
-    })
+    return render(request, 'user/edit-expense.html', {'form': form})
 
 
 
@@ -305,69 +235,6 @@ def delete_expense(request, expense_id):
         ExpenseManager.delete_expense(expense_id=expense_id, user_id=str(request.user.id))
         return redirect('dashboard')
     return render(request, 'user/delete-expense.html')
-
-
-
-
-
-'''
-@login_required(login_url='my-login')
-def update_profile(request):
-    """
-    Handles profile updates, including profile picture uploads to S3.
-    """
-    user_id = str(request.user.id)
-    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_S3_REGION_NAME)
-    s3_client = boto3.client('s3', region_name=settings.AWS_S3_REGION_NAME)
-
-    # Fetch user profile from DynamoDB
-    profile_table = dynamodb.Table('Profiles')  # Replace 'Profiles' with your actual table name
-    profile_data = profile_table.get_item(Key={'user_id': user_id}).get('Item', {})
-
-    if request.method == 'POST':
-        form = UpdateProfileForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Handle profile picture upload
-            profile_pic = request.FILES.get('profile_pic', None)
-            if profile_pic:
-                # Upload to S3
-                s3_key = f"profile_pictures/{user_id}/{profile_pic.name}"
-                s3_client.upload_fileobj(
-                    profile_pic,
-                    settings.AWS_STORAGE_BUCKET_NAME,
-                    s3_key,
-                    ExtraArgs={'ACL': 'public-read'}  # Public-read, adjust if needed
-                )
-                # Update S3 URL in DynamoDB
-                profile_pic_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/{s3_key}"
-                profile_table.update_item(
-                    Key={'user_id': user_id},
-                    UpdateExpression="SET profile_pic_url = :url",
-                    ExpressionAttributeValues={':url': profile_pic_url}
-                )
-
-            # Update other profile details in DynamoDB
-            username = form.cleaned_data.get('username')
-            email = form.cleaned_data.get('email')
-            profile_table.update_item(
-                Key={'user_id': user_id},
-                UpdateExpression="SET username = :username, email = :email",
-                ExpressionAttributeValues={
-                    ':username': username,
-                    ':email': email,
-                }
-            )
-            return redirect('dashboard')
-
-    # Populate the form with data from DynamoDB
-    initial_data = {
-        'username': profile_data.get('username', ''),
-        'email': profile_data.get('email', ''),
-    }
-    form = UpdateProfileForm(initial=initial_data)
-    return render(request, 'user/update-profile.html', {'form': form})
-'''
-
 
 
 
