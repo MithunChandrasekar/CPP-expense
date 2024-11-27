@@ -21,14 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-#ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['expense-application-env.eba-7v85kh5i.us-east-1.elasticbeanstalk.com']
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = '=t^os0)k(j25-%_p-i422xp@sluf^pl-zso&u*hw0w0$&30wtd'
+SECRET_KEY = 'Vj9Q0dh7TMLJKM1x1jetBHvIY04DdO__WkCCKSoaRchE2fF4niQ1ZNzj-qhV-r76VeA'
 
-SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
-DEBUG = os.getenv("DEBUG", "True") == "True"
-#DEBUG = True
+#SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
+#DEBUG = os.getenv("DEBUG", "True") == "True"
+DEBUG = False
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
 
