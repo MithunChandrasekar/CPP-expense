@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import ProfileManager, ExpenseManager
+from .models import ProfileManager, ExpenseManager, expense_table
 from .forms import CreateUserForm, LoginForm, ExpenseForm, UpdateProfileForm, UpdateUserForm
 import uuid  # For generating unique expense IDs
 import datetime
@@ -182,7 +182,6 @@ def add_expense(request):
 
     form = ExpenseForm()
     return render(request, 'user/add-expense.html', {'form': form})
-
 
 
 

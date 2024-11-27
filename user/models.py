@@ -87,14 +87,18 @@ class ExpenseManager:
                 'date': date,
             }
         )
-
     @staticmethod
     def get_expenses_by_user(user_id):
-        response = expense_table.scan(
-            FilterExpression="user_id = :uid",
-            ExpressionAttributeValues={':uid': user_id}
-        )
-        return response.get('Items', [])
+        try:
+            response = expense_table.scan(
+                FilterExpression="user_id = :uid",
+                ExpressionAttributeValues={':uid': user_id}
+            )
+            return response.get('Items', [])
+        except Exception as e:
+            logger.error(f"Error fetching expenses for user {user_id}: {e}")
+            return []
+
 
     @staticmethod
     def update_expense(expense_id, user_id, **kwargs):
