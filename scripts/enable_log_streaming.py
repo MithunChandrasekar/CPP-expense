@@ -1,4 +1,4 @@
-from enable_log_streaming.enable_log_streaming import enable_log_streaming
+from enable_log_streaming import enable_log_streaming
 
 # Replace with your environment name
 environment_name = "expense-application-env"
