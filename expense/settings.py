@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 #DEBUG = False
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True
 
 
 CSRF_TRUSTED_ORIGINS = [
