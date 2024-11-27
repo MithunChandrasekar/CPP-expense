@@ -227,6 +227,31 @@ def edit_expense(request, expense_id):
     return render(request, 'user/edit-expense.html', {'form': form})
 '''
 
+
+@staticmethod
+def update_expense(expense_id, user_id, **kwargs):
+    try:
+        # Dynamically initialize the DynamoDB resource and table
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        expense_table = dynamodb.Table('Expense')  # Replace 'Expense' with your table name
+
+        # Build the UpdateExpression
+        update_expression = "SET " + ", ".join(f"{k} = :{k}" for k in kwargs)
+        expression_values = {f":{k}": v for k, v in kwargs.items()}
+
+        print(f"Updating expense with: {expression_values}")  # Debugging
+        expense_table.update_item(
+            Key={'expense_id': expense_id, 'user_id': user_id},
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_values,
+        )
+    except Exception as e:
+        print(f"Error updating DynamoDB: {e}")  # Log DynamoDB errors
+        raise e
+
+
+
+
 @login_required(login_url='my-login')
 def edit_expense(request, expense_id):
     user_id = str(request.user.id)
@@ -237,25 +262,34 @@ def edit_expense(request, expense_id):
 
     if not expense:
         messages.error(request, "Expense not found.")
-        return redirect('dashboard')
+        return redirect('dashboard')  # Redirect if expense is not found
 
     if request.method == 'POST':
         form = ExpenceForm(request.POST)
         if form.is_valid():
-            ExpenseManager.update_expense(
-                expense_id=expense_id,
-                user_id=user_id,
-                name=form.cleaned_data['name'],
-                category=form.cleaned_data['category'],  # No predefined category constraints
-                amount=form.cleaned_data['amount']
-            )
-            messages.success(request, "Expense updated successfully.")
-            return redirect('dashboard')
+            try:
+                # Update the expense
+                ExpenseManager.update_expense(
+                    expense_id=expense_id,
+                    user_id=user_id,
+                    name=form.cleaned_data['name'],
+                    category=form.cleaned_data['category'],
+                    amount=form.cleaned_data['amount']
+                )
+                messages.success(request, "Expense updated successfully.")
+                return redirect('dashboard')
+            except Exception as e:
+                # Log the exception for debugging
+                print(f"Error updating expense: {e}")
+                messages.error(request, "An error occurred while updating the expense.")
+        else:
+            messages.error(request, "Invalid form submission.")
 
     # Pre-fill the form with existing expense data
     form = ExpenceForm(initial=expense)
-
+    
     return render(request, 'user/edit-expense.html', {'form': form})
+
 
 
 @login_required(login_url='my-login')
