@@ -35,6 +35,7 @@ DEBUG = os.getenv("DEBUG", "True") == "True"
 
 CSRF_TRUSTED_ORIGINS = [
     'https://15155f23e5ef4afa812dfc93aaef473f.vfs.cloud9.us-east-1.amazonaws.com',
+    'http://expense-application-env.eba-7v85kh5i.us-east-1.elasticbeanstalk.com/',
 ]
 
 # Application definition

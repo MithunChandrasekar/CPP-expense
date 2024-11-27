@@ -1,0 +1,61 @@
+{% extends 'user/navbar.html' %}
+{% load static %}
+{% block content %}
+
+<div class="m-10 font-bold">Edit Expense</div>
+
+<form class="shadow-lg m-10 rounded-lg" method="post">
+    {% csrf_token %}
+    <div class="p-5">
+        <!-- Expense Name -->
+        <div class="mb-4">
+            <label for="expense_name" class="font-semibold block">Expense Name</label>
+            <input 
+                type="text" 
+                name="name" 
+                id="expense_name" 
+                class="border p-2 w-full rounded-lg" 
+                value="{{ form.name.value }}" 
+                placeholder="Enter Expense Name" 
+                required>
+        </div>
+
+        <!-- Expense Category -->
+        <div class="mb-4">
+            <label for="expense_category" class="font-semibold block">Expense Category</label>
+            <input 
+                type="text" 
+                name="category" 
+                id="expense_category" 
+                class="border p-2 w-full rounded-lg" 
+                value="{{ form.category.value }}" 
+                placeholder="Enter Expense Category" 
+                required>
+        </div>
+
+        <!-- Expense Amount -->
+        <div class="mb-4">
+            <label for="expense_amount" class="font-semibold block">Expense Amount</label>
+            <input 
+                type="number" 
+                name="amount" 
+                id="expense_amount" 
+                class="border p-2 w-full rounded-lg" 
+                value="{{ form.amount.value }}" 
+                placeholder="Enter Expense Amount" 
+                step="0.01" 
+                required>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-6">
+            <button 
+                type="submit" 
+                class="bg-green-500 px-5 py-2 rounded-lg text-white font-bold">
+                Save Changes
+            </button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}

@@ -202,7 +202,7 @@ def add_expense(request):
     form = ExpenceForm()
     return render(request, 'user/add-expense.html', {'form': form})
 
-
+'''
 
 @login_required(login_url='my-login')
 def edit_expense(request, expense_id):
@@ -224,6 +224,37 @@ def edit_expense(request, expense_id):
     expenses = ExpenseManager.get_expenses_by_user(user_id)
     expense = next((exp for exp in expenses if exp['expense_id'] == expense_id), None)
     form = ExpenceForm(initial=expense)
+    return render(request, 'user/edit-expense.html', {'form': form})
+'''
+
+@login_required(login_url='my-login')
+def edit_expense(request, expense_id):
+    user_id = str(request.user.id)
+
+    # Fetch the specific expense from DynamoDB
+    expenses = ExpenseManager.get_expenses_by_user(user_id)
+    expense = next((exp for exp in expenses if exp['expense_id'] == expense_id), None)
+
+    if not expense:
+        messages.error(request, "Expense not found.")
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = ExpenceForm(request.POST)
+        if form.is_valid():
+            ExpenseManager.update_expense(
+                expense_id=expense_id,
+                user_id=user_id,
+                name=form.cleaned_data['name'],
+                category=form.cleaned_data['category'],  # No predefined category constraints
+                amount=form.cleaned_data['amount']
+            )
+            messages.success(request, "Expense updated successfully.")
+            return redirect('dashboard')
+
+    # Pre-fill the form with existing expense data
+    form = ExpenceForm(initial=expense)
+
     return render(request, 'user/edit-expense.html', {'form': form})
 
 
