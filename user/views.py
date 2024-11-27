@@ -17,6 +17,8 @@ import boto3
 import logging
 logger = logging.getLogger(__name__)
 '''
+import logging
+logger = logging.getLogger(__name__)
 
 def homepage(request):
     
@@ -264,7 +266,6 @@ def profile_management(request):
             'user_id': user_id,
             'username': request.user.username,
             'email': request.user.email,
-            'profile_pic_url': f"https://{bucket_name}.s3.{region}.amazonaws.com/profile_pictures/default.png",
         }
 
     if request.method == 'POST':
@@ -283,32 +284,7 @@ def profile_management(request):
                 # Update DynamoDB profile data
                 profile_data['username'] = user.username
                 profile_data['email'] = user.email
-
-                # Handle profile picture upload
-                profile_pic = profile_form.cleaned_data.get('profile_pic')
-                if profile_pic:
-                    try:
-                        s3_client = boto3.client('s3', region_name=region)
-                        s3_client.upload_fileobj(
-                            profile_pic,
-                            bucket_name,
-                            f"profile_pictures/{user_id}.png"
-                        )
-                        # Generate a pre-signed URL to access the file privately
-                        presigned_url = s3_client.generate_presigned_url(
-                            'get_object',
-                            Params={
-                                'Bucket': bucket_name,
-                                'Key': f"profile_pictures/{user_id}.png"
-                            },
-                            ExpiresIn=3600  # URL expiration time in seconds
-                        )
-                        profile_data['profile_pic_url'] = presigned_url
-                        #logger.info("Profile picture uploaded successfully to S3.")
-                    except Exception as s3_error:
-                        #logger.error(f"Error uploading profile picture to S3: {s3_error}")
-                        profile_data['profile_pic_url'] = f"https://{bucket_name}.s3.{region}.amazonaws.com/profile_pictures/default.png"
-
+                
                 # Save updated profile data to DynamoDB
                 profile_table.put_item(Item=profile_data)
 

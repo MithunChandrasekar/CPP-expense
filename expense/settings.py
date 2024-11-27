@@ -30,7 +30,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 DEBUG = os.getenv("DEBUG", "True") == "True"
 #DEBUG = False
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+DEBUG = True
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -208,3 +208,29 @@ LOGGING = {
     },
 }
 '''
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'your_app_name': {  # Replace with the actual app name
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
