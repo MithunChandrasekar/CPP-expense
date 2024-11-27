@@ -226,69 +226,76 @@ def edit_expense(request, expense_id):
     form = ExpenceForm(initial=expense)
     return render(request, 'user/edit-expense.html', {'form': form})
 '''
-
-
-@staticmethod
-def update_expense(expense_id, user_id, **kwargs):
-    try:
-        # Dynamically initialize the DynamoDB resource and table
-        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-        expense_table = dynamodb.Table('Expense')  # Replace 'Expense' with your table name
-
-        # Build the UpdateExpression
-        update_expression = "SET " + ", ".join(f"{k} = :{k}" for k in kwargs)
-        expression_values = {f":{k}": v for k, v in kwargs.items()}
-
-        print(f"Updating expense with: {expression_values}")  # Debugging
-        expense_table.update_item(
-            Key={'expense_id': expense_id, 'user_id': user_id},
-            UpdateExpression=update_expression,
-            ExpressionAttributeValues=expression_values,
-        )
-    except Exception as e:
-        print(f"Error updating DynamoDB: {e}")  # Log DynamoDB errors
-        raise e
-
-
-
-
 @login_required(login_url='my-login')
 def edit_expense(request, expense_id):
-    user_id = str(request.user.id)
+    user_id = str(request.user.id)  # Get the logged-in user's ID
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Replace with your AWS region
+    expense_table = dynamodb.Table('Expense')
 
-    # Fetch the specific expense from DynamoDB
-    expenses = ExpenseManager.get_expenses_by_user(user_id)
-    expense = next((exp for exp in expenses if exp['expense_id'] == expense_id), None)
+    # Fetch the existing expense data from DynamoDB
+    try:
+        response = expense_table.get_item(
+            Key={
+                'expense_id': expense_id,
+                'user_id': user_id
+            }
+        )
+        expense_data = response.get('Item', {})
+    except Exception as e:
+        expense_data = {}
+        print(f"Error fetching expense data: {e}")  # Logging for debugging
 
-    if not expense:
+    # If the expense doesn't exist, redirect back to the dashboard
+    if not expense_data:
         messages.error(request, "Expense not found.")
-        return redirect('dashboard')  # Redirect if expense is not found
+        return redirect('dashboard')
 
+    # If the request is POST, update the expense
     if request.method == 'POST':
         form = ExpenceForm(request.POST)
+
         if form.is_valid():
             try:
-                # Update the expense
-                ExpenseManager.update_expense(
-                    expense_id=expense_id,
-                    user_id=user_id,
-                    name=form.cleaned_data['name'],
-                    category=form.cleaned_data['category'],
-                    amount=form.cleaned_data['amount']
+                # Update the expense data
+                updated_data = form.cleaned_data
+
+                # Save the updated data to DynamoDB
+                expense_table.update_item(
+                    Key={
+                        'expense_id': expense_id,
+                        'user_id': user_id
+                    },
+                    UpdateExpression="""
+                        SET name = :name,
+                            amount = :amount,
+                            category = :category
+                    """,
+                    ExpressionAttributeValues={
+                        ':name': updated_data['name'],
+                        ':amount': updated_data['amount'],
+                        ':category': updated_data['category']
+                    }
                 )
+
                 messages.success(request, "Expense updated successfully.")
                 return redirect('dashboard')
+            
+            
             except Exception as e:
-                # Log the exception for debugging
                 print(f"Error updating expense: {e}")
-                messages.error(request, "An error occurred while updating the expense.")
-        else:
-            messages.error(request, "Invalid form submission.")
+                messages.error(request, "Failed to update the expense. Please try again.")
+    else:
+        # Populate the form with existing data for GET requests
+        form = ExpenceForm(initial={
+            'name': expense_data.get('name', ''),
+            'amount': expense_data.get('amount', ''),
+            'category': expense_data.get('category', ''),
+        })
 
-    # Pre-fill the form with existing expense data
-    form = ExpenceForm(initial=expense)
-    
-    return render(request, 'user/edit-expense.html', {'form': form})
+    return render(request, 'user/edit-expense.html', {
+        'form': form,
+        'expense_id': expense_id  # Pass the expense_id for debugging or dynamic display
+    })
 
 
 
