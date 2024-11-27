@@ -192,6 +192,7 @@ def add_expense(request):
 def edit_expense(request, expense_id):
     # Get the current user ID
     user_id = str(request.user.id)
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')  # Replace with your AWS region
 
     # Fetch the expense details from DynamoDB
     expenses = ExpenseManager.get_expenses_by_user(user_id)

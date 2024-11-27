@@ -18,7 +18,7 @@ import watchtower
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
+#ALLOWED_HOSTS = ['*']
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
