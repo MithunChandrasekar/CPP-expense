@@ -39,13 +39,13 @@ profile_table = dynamodb.Table('Profile')
 expense_table = dynamodb.Table('Expense')
 
 
-
+#django model to get the profile picture currently disabled
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, default=1)  # Replace 1 with a valid user ID
     picture = models.ImageField(upload_to='profile_pictures/', default='default.png')
 
 
-
+# class which contains aws sdk code to dynamo db for user management
 class ProfileManager:
     @staticmethod
     def create_profile(user_id, profile_pic='Default.png'):
@@ -73,7 +73,7 @@ class ProfileManager:
     def delete_profile(user_id):
         profile_table.delete_item(Key={'user_id': user_id})
 
-
+# class which contains aws sdk code to dynamo db for expense management
 class ExpenseManager:
     @staticmethod
     def create_expense(expense_id, user_id, name, amount, category, date):
@@ -96,13 +96,13 @@ class ExpenseManager:
             )
             return response.get('Items', [])
         except Exception as e:
-            logger.error(f"Error fetching expenses for user {user_id}: {e}")
+            #logger.error(f"Error fetching expenses for user {user_id}: {e}")
             return []
 
 
     @staticmethod
     def update_expense(expense_id, user_id, **kwargs):
-        # Use expression attribute names to handle reserved keywords like "name"
+        # used to not allow the user to add any detail same as the keywords in AWS
         update_expression = "SET " + ", ".join(f"#{k} = :{k}" for k in kwargs)
         expression_attribute_names = {f"#{k}": k for k in kwargs}
         expression_values = {f":{k}": v for k, v in kwargs.items()}

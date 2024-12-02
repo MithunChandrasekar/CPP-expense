@@ -7,10 +7,10 @@ from django.forms.widgets import PasswordInput, TextInput
 
 
 class CreateUserForm(UserCreationForm):
-    """
-    Form for creating new users. Extends the built-in UserCreationForm.
-    """
-    email = forms.EmailField(required=True)  # Ensure email is required
+    
+    #the form which appears at the registration page.
+    
+    email = forms.EmailField(required=True)  # to nsure email is required
 
     class Meta:
         model = User
@@ -20,31 +20,15 @@ class CreateUserForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
-    """
-    Custom login form with additional styling or customization.
-    """
+    
+    #loginform which appears at the user login page.
+    
     username = forms.CharField(widget=TextInput(attrs={'placeholder': 'Username'}))
     password = forms.CharField(widget=PasswordInput(attrs={'placeholder': 'Password'}))
-
-'''
-
-class ExpenceForm(forms.Form):
-    """
-    Form for creating and managing expenses in DynamoDB.
-    """
-    name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'placeholder': 'Expense Name'}),
-    )
-    amount = forms.IntegerField(
-        widget=forms.NumberInput(attrs={'placeholder': 'Amount'}),
-    )
-    category = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={'placeholder': 'Category'}),
-    )
-'''
     
+  
+  
+# expense form during add expense    
 class ExpenseForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
     amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
@@ -52,7 +36,7 @@ class ExpenseForm(forms.Form):
     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))    
 
 
-
+# the user updation form during profile management
 class UpdateUserForm(forms.ModelForm):
 
     password = None
@@ -65,7 +49,7 @@ class UpdateUserForm(forms.ModelForm):
 
 
 
-
+#currently profile picture addition is disabled
 class UpdateProfileForm(forms.Form):
     """
     Form for updating profile data stored in DynamoDB.

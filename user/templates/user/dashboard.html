@@ -200,6 +200,7 @@
         const cats =[];
         const catSumDiv = document.getElementById('cat-sum-table').getElementsByTagName('div');
         const cat_sums =[];
+        
         for(i=0;i<catSumDiv.length;i++){
             if(i%2 == 1){
                 cat_sums.push(catSumDiv[i].innerText.replace("€", ""))

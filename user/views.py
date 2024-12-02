@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 import logging
 logger = logging.getLogger(__name__)
 
+# landing page of the user
 def homepage(request):
     
     return render(request, 'user/index.html')
@@ -28,7 +29,7 @@ def homepage(request):
 
 
 
-
+# registration page 
 def register(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -61,7 +62,7 @@ def register(request):
 
 
 
-
+#Login page
 def my_login(request):
     form = LoginForm()
     if request.method == 'POST':
@@ -77,14 +78,14 @@ def my_login(request):
     return render(request, 'user/my-login.html', context)
 
 
-
+# logout button
 @login_required(login_url='my-login')
 def user_logout(request):
     logout(request)
     return redirect('homepage')
 
 
-
+# user landing page after authentication
 @login_required(login_url='my-login')
 def dashboard(request):
     user_id = str(request.user.id)
@@ -107,7 +108,7 @@ def dashboard(request):
     else:
         form = ExpenseForm()
 
-    # Fetch existing expenses
+    # Read operation on the expense 
     expenses = ExpenseManager.get_expenses_by_user(user_id)
 
     # Calculate total expenses
@@ -129,9 +130,9 @@ def dashboard(request):
     
     daily_sums = defaultdict(float)
     for expense in expenses:
-        expense_date = expense.get('date')  # Assuming 'date' is in 'YYYY-MM-DD' format
+        expense_date = expense.get('date')  
         if expense_date and expense_date >= thirty_days_ago.isoformat():
-            daily_sums[expense_date] += float(expense.get('amount', 0))  # Convert amount to float
+            daily_sums[expense_date] += float(expense.get('amount', 0))  
 
     # Sort daily sums by date
     daily_sums_sorted = sorted(daily_sums.items(), key=lambda x: x[0])
@@ -156,14 +157,14 @@ def dashboard(request):
         'monthly_sum': monthly_expenses,
         'weekly_sum': weekly_expenses,
         'daily_sums': daily_sums_sorted,  # Pass daily expenses for 30 days
-        'categorical_sums': dict(categorical_sums),  # Pass category-based sums
+        'categorical_sums': dict(categorical_sums),  # Pass category-based sums for the chart JS
         'form': form,
     }
     return render(request, 'user/dashboard.html', context)
 
 
 
-
+# used to create the expense
 
 @login_required(login_url='my-login')
 def add_expense(request):
@@ -188,7 +189,7 @@ def add_expense(request):
 
 
 
-
+#used to update the expense
 
 @login_required(login_url='my-login')
 def edit_expense(request, expense_id):
@@ -230,7 +231,7 @@ def edit_expense(request, expense_id):
     return render(request, 'user/edit-expense.html', {'form': form})
 
 
-
+# Used to delete the expense
 @login_required(login_url='my-login')
 def delete_expense(request, expense_id):
     if request.method == 'POST':
@@ -260,7 +261,6 @@ def profile_management(request):
         profile_data = {}
         #logger.error(f"Error fetching profile data from DynamoDB: {e}")
 
-    # Default profile picture if no record is found
     if not profile_data:
         profile_data = {
             'user_id': user_id,
@@ -272,7 +272,6 @@ def profile_management(request):
         user_form = UpdateUserForm(request.POST, instance=request.user)
         profile_form = UpdateProfileForm(request.POST, request.FILES)
 
-        # Check both forms for validity
         if user_form.is_valid() and profile_form.is_valid():
             try:
                 # Update user model data
@@ -296,7 +295,6 @@ def profile_management(request):
                         f"Profile updated successfully!\n\n"
                         f"Username: {user.username}\n"
                         f"Email: {user.email}\n"
-                        f"Profile Picture: {profile_data['profile_pic_url']}"
                     )
                     sns_client.publish(
                         TopicArn=sns_topic_arn,
@@ -326,7 +324,7 @@ def profile_management(request):
 
 
 
-
+# delete the account from profile management page
 @login_required(login_url='my-login')
 def delete_account(request):
     user = request.user
